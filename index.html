@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-time Chat</title>
+  <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+</head>
+<body>
+  <h2>Simple Pusher Chat</h2>
+  <input type="text" id="message" placeholder="Type a message">
+  <button onclick="sendMessage()">Send</button>
+
+  <ul id="messages"></ul>
+
+  <script>
+    // 🔑 Replace with your actual Pusher key and cluster
+    const pusher = new Pusher('496ae61302c5907c39d0', {
+      cluster: 'ap2'
+    });
+
+    // 📡 Subscribe to the Pusher channel
+    const channel = pusher.subscribe('chat-channel');
+
+    // 📥 Listen for new message events
+    channel.bind('new-message', function(data) {
+      const listItem = document.createElement('li');
+      listItem.textContent = data.message;
+      document.getElementById('messages').appendChild(listItem);
+    });
+
+    // 📤 Send a message to the backend
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      fetch('http://localhost:3000/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      document.getElementById('message').value = '';
+    }
+  </script>
+</body>
+</html>
